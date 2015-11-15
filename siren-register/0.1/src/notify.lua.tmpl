@@ -1,0 +1,36 @@
+{{ if .Env.ETCD_ADDR }}
+local etcd = require('etcd').new('{{ js .Env.ETCD_ADDR }}')
+{{ else }}
+local etcd = require('etcd').new()
+{{ end }}
+
+{{ $host_ip := .Env.HOST_IP }}
+
+{{ range $_, $container := . }}
+{{ if $container.Env._SIREN_GROUP }}
+---- Generated entry for: {{ $container.Name }}
+-- Host ports
+{{ range $address := $container.Addresses }}
+{{ if $address.HostPort}}
+etcd:set(
+  '/siren/{{ js $container.Env._SIREN_GROUP }}/{{ js $container.ID }}/interface/{{ js $address.Port }}',
+  '{{ js $host_ip }}:{{ js $address.HostPort }}')
+{{ end }}
+{{ end }}
+-- Custom params
+{{ if $container.Env._SIREN_PARAMS }}
+local params = '{{ js $container.Env._SIREN_PARAMS }},'
+params:gsub("([^,]*),", function(c)
+  local key, value = c:match("([^=]*)=(.*)")
+  etcd:set(
+    '/siren/{{ js $container.Env._SIREN_GROUP }}/{{ js $container.ID }}/params/' .. key,
+    value)
+end)
+{{ end }}
+-- Refresh expiration for this container
+etcd:set(
+  '/siren/{{ js $container.Env._SIREN_GROUP }}/{{ js $container.ID }}',
+  nil,
+  {dir=true, prevExist=true, ttl=15})
+{{ end }}
+{{ end }}
