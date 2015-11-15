@@ -12,7 +12,7 @@ Major inspiration drawn from Jason Wilder:
 ```sh
 $ docker run -d -p 2379:2379 --name etcd anibali/etcd
 $ docker run --name siren --net=host --rm -it \
-  -e HOST_IP=$(hostname --all-ip-addresses | awk '{print $1}') \
+  -e HOST_IP=$(ip route get 1 | awk '{print $NF;exit}') \
   -e ETCD_ADDR=http://127.0.0.1:2379 \
   -v /var/run/docker.sock:/var/run/docker.sock \
   anibali/siren-register

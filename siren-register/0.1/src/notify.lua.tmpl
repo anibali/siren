@@ -1,20 +1,33 @@
-{{ if .Env.ETCD_ADDR }}
-local etcd = require('etcd').new('{{ js .Env.ETCD_ADDR }}')
-{{ else }}
-local etcd = require('etcd').new()
-{{ end }}
+-- Initialize etcd client
+local etcd
+if os.getenv('ETCD_ADDR') then
+  etcd = require('etcd').new(os.getenv('ETCD_ADDR'))
+else
+  etcd = require('etcd').new()
+end
 
-{{ $host_ip := .Env.HOST_IP }}
+-- Use set host IP if available
+local host_ip = os.getenv('HOST_IP')
+
+-- Otherwise attempt to automatically discover IP, which seems to work well
+-- when this container is run with --net=host
+if host_ip == nil then
+  local handle = io.popen('ip route get 1 | awk "{print \\$NF;exit}"')
+  host_ip = handle:read('*a'):gsub('^%s*(.-)%s*$', '%1')
+  handle:close()
+end
+
+---- GENERATED CODE ----
 
 {{ range $_, $container := . }}
 {{ if $container.Env._SIREN_GROUP }}
----- Generated entry for: {{ $container.Name }}
+---- Entry for: {{ $container.Name }}
 -- Host ports
 {{ range $address := $container.Addresses }}
 {{ if $address.HostPort}}
 etcd:set(
   '/siren/{{ js $container.Env._SIREN_GROUP }}/{{ js $container.ID }}/interface/{{ js $address.Port }}',
-  '{{ js $host_ip }}:{{ js $address.HostPort }}')
+  host_ip .. ':{{ js $address.HostPort }}')
 {{ end }}
 {{ end }}
 -- Custom params
@@ -34,3 +47,5 @@ etcd:set(
   {dir=true, prevExist=true, ttl=15})
 {{ end }}
 {{ end }}
+
+---- END GENERATED CODE ----

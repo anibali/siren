@@ -1,4 +1,4 @@
-FROM anibali/docker-gen:0.4
+FROM anibali/alpine-tini:3.2
 
 RUN apk add --update \
     --repository http://dl-1.alpinelinux.org/alpine/edge/testing/ \
