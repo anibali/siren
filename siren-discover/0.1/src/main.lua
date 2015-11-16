@@ -20,7 +20,7 @@ local function treeify(json, prefix)
   local value
   if json.dir then
     value = {}
-    for i, child in ipairs(json.nodes) do
+    for i, child in ipairs(json.nodes or {}) do
       table.insert(value, treeify(child, json.key .. '/'))
     end
   else
@@ -107,7 +107,6 @@ xavante.HTTP {
       {
         match = '.',
         with = function(req, res)
-          print(inspect(req))
           res.statusline = "HTTP/1.1 404 Not Found"
           res.headers['Content-Type'] = 'text/plain'
           res.content = 'Not found.'
