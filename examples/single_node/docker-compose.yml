@@ -1,0 +1,30 @@
+etcd:
+  image: anibali/etcd
+  ports:
+    - '2379:2379'
+discover:
+  image: anibali/siren-discover
+  environment:
+    - ETCD_ADDR=http://127.0.0.1:2379
+  ports:
+    - '8080:8080'
+  net: host # Necessary because etcd is listening on localhost only
+register:
+  image: anibali/siren-register
+  environment:
+    - ETCD_ADDR=http://127.0.0.1:2379
+  volumes:
+    - '/var/run/docker.sock:/var/run/docker.sock'
+  net: host # Necessary because etcd is listening on localhost only
+service1:
+  image: tutum/hello-world
+  environment:
+    - _SIREN_GROUP=web
+  ports:
+    - '80'
+service2:
+  image: tutum/hello-world
+  environment:
+    - _SIREN_GROUP=web
+  ports:
+    - '80'

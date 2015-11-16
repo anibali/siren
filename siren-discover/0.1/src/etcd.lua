@@ -40,7 +40,7 @@ function Etcd:set(key, value, opts)
   return cjson.decode(res.body)
 end
 
-function M.new(self, addr)
+function M.new(addr)
   local self = {}
   self.addr = addr or 'http://127.0.0.1:2379'
 

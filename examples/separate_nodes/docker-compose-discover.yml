@@ -1,0 +1,6 @@
+discover:
+  image: anibali/siren-discover
+  environment:
+    - ETCD_ADDR=http://192.168.0.3:2379
+  ports:
+    - '8080:8080'

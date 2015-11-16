@@ -1,0 +1,13 @@
+register:
+  image: anibali/siren-register
+  environment:
+    - ETCD_ADDR=http://192.168.0.3:2379
+  volumes:
+    - '/var/run/docker.sock:/var/run/docker.sock'
+  net: host # Not necessary if HOST_IP is passed in as an env var
+service:
+  image: tutum/hello-world
+  environment:
+    - _SIREN_GROUP=web
+  ports:
+    - '80'

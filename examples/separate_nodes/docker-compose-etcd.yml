@@ -1,0 +1,6 @@
+etcd:
+  image: anibali/etcd
+  command: >
+    etcd --bind-addr=0.0.0.0:2379 --advertise-client-urls http://192.168.0.3:2379
+  ports:
+    - '2379:2379'

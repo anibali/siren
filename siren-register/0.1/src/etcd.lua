@@ -15,8 +15,9 @@ local function to_query(data)
   return table.concat(entries, '&')
 end
 
-function Etcd:get(key)
-  local res = http:get(self.addr .. '/v2/keys/' .. key)
+function Etcd:get(key, opts)
+  opts = opts or {}
+  local res = http:get(self.addr .. '/v2/keys/' .. key .. '?' .. to_query(opts))
   assert(res.body ~= nil, res.err)
   return cjson.decode(res.body)
 end
@@ -39,7 +40,7 @@ function Etcd:set(key, value, opts)
   return cjson.decode(res.body)
 end
 
-function M.new(self, addr)
+function M.new(addr)
   local self = {}
   self.addr = addr or 'http://127.0.0.1:2379'
 
