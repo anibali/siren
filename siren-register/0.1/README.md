@@ -18,3 +18,7 @@ $ docker run --name siren --net=host --rm -it \
   anibali/siren-register
 $ docker stop etcd && docker rm etcd
 ```
+
+### Future work
+
+* Accept multiple etcd cluster members

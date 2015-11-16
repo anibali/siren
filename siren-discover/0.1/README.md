@@ -21,3 +21,7 @@ configuration.
 
 Please see the examples in /siren/examples for docker-compose files describing
 potential configurations.
+
+### Future work
+
+* Accept multiple etcd cluster members
