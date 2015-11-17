@@ -11,6 +11,7 @@ RUN apk add --update gcc lua5.2-dev musl-dev git \
     && luarocks install httpclient \
     && luarocks install lua-cjson \
     && luarocks install etlua \
+    && luarocks install stdlib \
     && apk del gcc lua5.2-dev musl-dev git
 
 RUN apk add --update haproxy \
