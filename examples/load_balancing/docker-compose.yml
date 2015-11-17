@@ -1,0 +1,39 @@
+etcd:
+  image: anibali/etcd
+  command: >
+    etcd --bind-addr=0.0.0.0:2379 --advertise-client-urls http://192.168.0.3:2379
+  ports:
+    - '2379:2379'
+discover:
+  image: anibali/siren-discover
+  environment:
+    - ETCD_ADDR=http://192.168.0.3:2379
+  ports:
+    - '8080'
+register:
+  image: anibali/siren-register
+  environment:
+    - ETCD_ADDR=http://192.168.0.3:2379
+  volumes:
+    - '/var/run/docker.sock:/var/run/docker.sock'
+  net: host # Not necessary if HOST_IP is passed in as an env var
+balancer:
+  image: anibali/siren-balancer
+  command: --service=hello --port=80
+  ports:
+    - '80:80'
+    - '1936:1936'
+  links:
+    - discover
+hello1:
+  image: tutum/hello-world
+  environment:
+    - _SIREN_SERVICE=hello
+  ports:
+    - '80'
+hello2:
+  image: tutum/hello-world
+  environment:
+    - _SIREN_SERVICE=hello
+  ports:
+    - '80'
