@@ -75,10 +75,28 @@ local function get_services()
   end
   if cache == nil then
     local etcd_response = etcd:get('/siren/', {recursive=true})
-    cache = niceify(treeify(etcd_response.node).siren)
-    cache_updated_at = now
+    if etcd_response and etcd_response.node then
+      cache = niceify(treeify(etcd_response.node).siren)
+      cache_updated_at = now
+    end
   end
   return cache
+end
+
+require('xavante.httpd').errorhandler = function(msg, co, skt)
+    msg = tostring(msg)
+        io.stderr:write('  Internal server error: ' .. msg .. '\n',
+          '  ' .. tostring(co) .. '\n',
+          '  ' .. tostring(skt) .. '\n')
+        skt:send('HTTP/1.0 500 Internal Server Error\r\n')
+        skt:send(string.format('Date: %s\r\n\r\n', os.date('!%a, %d %b %Y %H:%M:%S GMT')))
+        skt:send(string.format([[
+<html><head><title>Internal server error</title></head>
+<body>
+<h1>Internal server error</h1>
+<p>%s</p>
+</body></html>
+]], string.gsub(msg, '\n', '<br/>\n')))
 end
 
 -- Set up server routes
@@ -91,7 +109,7 @@ xavante.HTTP {
         match = '^/v1/services/?$',
         with = function(req, res)
           res.headers['Content-Type'] = 'application/json'
-          res.content = cjson.encode(get_services())
+          res.content = cjson.encode(get_services() or {})
           return res
         end,
       },
@@ -100,7 +118,7 @@ xavante.HTTP {
         with = function(req, res)
           local group_name = string.match(req.relpath, '^/v1/services/([^/]*)/?$')
           res.headers['Content-Type'] = 'application/json'
-          res.content = cjson.encode({[group_name]=get_services()[group_name]})
+          res.content = cjson.encode({[group_name]=get_services()[group_name] or {}})
           return res
         end,
       },

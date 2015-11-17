@@ -35,7 +35,7 @@ function Etcd:set(key, value, opts)
   local res = http:put(self.addr .. '/v2/keys/' .. key,
     to_query(data),
     {content_type="application/x-www-form-urlencoded"})
-  print(to_query(data))
+
   assert(res.body ~= nil, res.err)
   return cjson.decode(res.body)
 end
