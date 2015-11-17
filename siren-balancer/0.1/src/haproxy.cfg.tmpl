@@ -1,0 +1,26 @@
+global
+    daemon
+    maxconn 4096
+    pidfile /var/run/haproxy.pid
+
+defaults
+    mode tcp
+    timeout connect 5s
+    timeout client 1m
+    timeout server 1m
+    option redispatch
+    balance roundrobin
+
+listen stats :1936
+    mode http
+    stats enable
+    stats hide-version
+    #stats realm Haproxy\ Statistics
+    stats uri /
+    #stats auth Username:Password
+
+listen <%- group_name %>
+    bind *:<%- port %>
+<% for i, backend in ipairs(backends) do -%>
+    server <%- backend.name %> <%- backend.addr %> check inter 2s rise 3 fall 2
+<% end -%>
