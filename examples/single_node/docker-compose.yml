@@ -19,12 +19,12 @@ register:
 service1:
   image: tutum/hello-world
   environment:
-    - _SIREN_GROUP=web
+    - _SIREN_SERVICE=web
   ports:
     - '80'
 service2:
   image: tutum/hello-world
   environment:
-    - _SIREN_GROUP=web
+    - _SIREN_SERVICE=web
   ports:
     - '80'

@@ -20,13 +20,13 @@ end
 ---- GENERATED CODE ----
 
 {{ range $_, $container := . }}
-{{ if $container.Env._SIREN_GROUP }}
+{{ if $container.Env._SIREN_SERVICE }}
 ---- Entry for: {{ $container.Name }}
 -- Host ports
 {{ range $address := $container.Addresses }}
 {{ if $address.HostPort}}
 etcd:set(
-  '/siren/{{ js $container.Env._SIREN_GROUP }}/{{ js $container.ID }}/interface/{{ js $address.Port }}',
+  '/siren/{{ js $container.Env._SIREN_SERVICE }}/{{ js $container.ID }}/interface/{{ js $address.Port }}',
   host_ip .. ':{{ js $address.HostPort }}')
 {{ end }}
 {{ end }}
@@ -36,13 +36,13 @@ local params = '{{ js $container.Env._SIREN_PARAMS }},'
 params:gsub("([^,]*),", function(c)
   local key, value = c:match("([^=]*)=(.*)")
   etcd:set(
-    '/siren/{{ js $container.Env._SIREN_GROUP }}/{{ js $container.ID }}/params/' .. key,
+    '/siren/{{ js $container.Env._SIREN_SERVICE }}/{{ js $container.ID }}/params/' .. key,
     value)
 end)
 {{ end }}
 -- Refresh expiration for this container
 etcd:set(
-  '/siren/{{ js $container.Env._SIREN_GROUP }}/{{ js $container.ID }}',
+  '/siren/{{ js $container.Env._SIREN_SERVICE }}/{{ js $container.ID }}',
   nil,
   {dir=true, prevExist=true, ttl=15})
 {{ end }}

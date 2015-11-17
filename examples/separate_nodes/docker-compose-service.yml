@@ -8,6 +8,6 @@ register:
 service:
   image: tutum/hello-world
   environment:
-    - _SIREN_GROUP=web
+    - _SIREN_SERVICE=web
   ports:
     - '80'

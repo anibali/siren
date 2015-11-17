@@ -46,7 +46,7 @@ discover:
 hello-world:
   image: tutum/hello-world
   environment:
-    - _SIREN_GROUP=hello-world
+    - _SIREN_SERVICE=hello-world
   ports:
     - '80'
 register:
@@ -62,7 +62,7 @@ as though it were `hello-world` directly. The advantage is that `hello-world`
 can be stopped, started and moved without needing to relink any dependent
 containers. Thanks to service discovery, `hello-world-ambassador` will
 automatically swap to relay TCP connections to wherever a container with the
-appropriate _SIREN_GROUP (hello-world) and exposed port (80) is running.
+appropriate _SIREN_SERVICE (hello-world) and exposed port (80) is running.
 
 To see for yourself, stop and recreate `hello-world`. You should notice that
 the dependent `curl-hello-world` service changes to print the response of the

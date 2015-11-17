@@ -8,7 +8,7 @@ Major inspiration drawn from Jason Wilder:
 ["Docker Service Discovery Using Etcd and Haproxy"](http://jasonwilder.com/blog/2014/07/15/docker-service-discovery/)
 
 siren-discover exposes a HTTP API for listing running services. For example,
-`/v1/services/foo` will list all running services with `_SIREN_GROUP=foo`.
+`/v1/services/foo` will list all running services with `_SIREN_SERVICE=foo`.
 It requires etcd and one or more instances of siren-register to be running on
 the network to function.
 

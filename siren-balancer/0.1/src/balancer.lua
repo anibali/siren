@@ -6,8 +6,18 @@ local signal = require('posix.signal')
 local unistd = require('posix.unistd')
 local etlua = require('etlua')
 
-local group_name = arg[1]
-local service_port = arg[2]
+if #arg ~= 2 then
+  print('Usage: lua balancer.lua service_name service_port')
+  print()
+  print('service_name = value of _SIREN_SERVICE set on containers in service')
+  print('service_port = port number to balance')
+  print()
+  print('error: wrong number of arguments')
+  os.exit(1)
+end
+
+local service_name = arg[1]
+local port = arg[2]
 
 local template_file = io.open('haproxy.cfg.tmpl')
 local template = etlua.compile(template_file:read('*a'))
@@ -15,24 +25,24 @@ template_file:close()
 
 while true do
   local backends = {}
-  local res = http:get('http://discover:8080/v1/services/' .. group_name)
+  local res = http:get('http://discover:8080/v1/services/' .. service_name)
 
   if res.body ~= nil and res.code == 200 then
     local services = cjson.decode(res.body)
-    if #services[group_name] > 0 then
-      for i, service in ipairs(services[group_name] or {}) do
-        if service.interface[service_port] then
+    if #services[service_name] > 0 then
+      for i, container in ipairs(services[service_name] or {}) do
+        if container.interface[port] then
           table.insert(backends, {
-            name=service.id,
-            addr=service.interface[service_port]
+            name=container.id,
+            addr=container.interface[port]
           })
         end
       end
     end
 
     local haproxy_config = template({
-      group_name=group_name,
-      port=service_port,
+      service_name=service_name,
+      port=port,
       backends=backends})
 
     local config_file = io.open('/etc/haproxy.cfg', 'w')

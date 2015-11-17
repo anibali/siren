@@ -19,7 +19,7 @@ listen stats :1936
     stats uri /
     #stats auth Username:Password
 
-listen <%- group_name %>
+listen <%- service_name %>
     bind *:<%- port %>
 <% for i, backend in ipairs(backends) do -%>
     server <%- backend.name %> <%- backend.addr %> check inter 2s rise 3 fall 2
